@@ -17,11 +17,11 @@ func main() {
 		Policy:              circuitbreaker.MaxFails,
 		MaxFails:            literal.ToPointer(uint64(5)),
 		MaxConsecutiveFails: literal.ToPointer(uint64(5)),
-		OpenInterval:        literal.ToPointer(160 * time.Millisecond),
+		OpenInterval:        literal.ToPointer(50 * time.Millisecond),
 	}
 	cb := circuitbreaker.New(cbOpts)
 	wg := &sync.WaitGroup{}
-	for i := 1; i < 100; i += 1 {
+	for i := 1; i < 30; i += 1 {
 		wg.Add(1)
 		go makeServiceCall(i, cb, wg)
 		time.Sleep(10 * time.Millisecond)
@@ -33,7 +33,7 @@ func main() {
 }
 
 func serviceMethod(id int) (string, error) {
-	if val := rand.Float64(); val <= 0.3 {
+	if val := rand.Float64(); val <= 0.5 {
 		return "", errors.New("failed")
 	}
 	return fmt.Sprintf("[id: %d] done.", id), nil
